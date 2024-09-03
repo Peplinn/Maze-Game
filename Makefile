@@ -1,2 +1,2 @@
 all:
-	gcc main.c -Wall -Werror -Wextra -pedantic -o main
+	gcc src/main.c -Wall -Werror -Wextra -pedantic -o main -lSDL2
