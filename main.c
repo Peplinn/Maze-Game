@@ -22,6 +22,12 @@ typedef struct SDL_Instance
     SDL_Renderer *renderer;
 } SDL_Instance;
 
+struct Colour {
+    unsigned char R;
+    unsigned char G;
+    unsigned char B;
+};
+
 int init_instance(SDL_Instance *);
 
 #endif
@@ -73,7 +79,7 @@ int init_instance(SDL_Instance *instance)
     SDL_GetError();
 
     /*Create new Window instance*/
-    instance ->window = SDL_CreateWindow("SDL2 \\o/", SDL_WINDOWPOS_CENTERED,
+    instance ->window = SDL_CreateWindow("SDL2 Maze Game", SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED, 1260, 720, 0);
 
     
@@ -196,10 +202,28 @@ void raycast_and_render(SDL_Instance *instance, double posX, double posY, double
         int drawEnd = lineHeight / 2 + screenHeight / 2;
         if (drawEnd >= screenHeight) drawEnd = screenHeight - 1;
 
-        Uint8 colour = 255 / (worldMap[mapX][mapY]);
-        if (side == 1) colour = colour / 2;
+        //Edit Wall Colours
+        // Uint8 colour = 255 / (worldMap[mapX][mapY]);
+        struct Colour wallColour;
 
-        draw_vertical_line(instance, x, drawStart, drawEnd, colour, colour, colour);
+
+        switch(worldMap[mapX][mapY])
+        {
+            case 1:  wallColour.R = 255;    break; //red
+            case 2:  wallColour.G = 255;    break; //green
+            case 3:  wallColour.B = 255;    break; //blue
+            case 4:  wallColour.R = 255; wallColour.G = 255; wallColour.B = 255;  break; //white
+            default: wallColour.R = 255; wallColour.G = 255; break; //yellow
+        }
+
+        if (side == 1)
+        {
+            wallColour.R = wallColour.R / 2;
+            wallColour.G = wallColour.G / 2;
+            wallColour.B = wallColour.B / 2;
+        }
+
+        draw_vertical_line(instance, x, drawStart, drawEnd, wallColour.R, wallColour.G, wallColour.B);
     }
 
     oldTime = time;
