@@ -3,13 +3,12 @@
 #ifndef _MAIN_H_
 #define _MAIN_H_
 
-// #include "src/include/SDL2/SDL.h"
+
 #include <SDL2/SDL.h>
 #include <stdio.h>
 #include <math.h>
+#include <stdbool.h>
 
-
-// #undef main
 
 #define screenWidth 640
 #define screenHeight 480
@@ -22,15 +21,33 @@ typedef struct SDL_Instance
     SDL_Renderer *renderer;
 } SDL_Instance;
 
+typedef struct {
+    int input[256];
+} Game;
+
+Game game = {
+    .input = {0}
+};
+
 struct Colour {
     unsigned char R;
     unsigned char G;
     unsigned char B;
 };
 
+
+//Function Declarations
 int init_instance(SDL_Instance *);
+void draw_components(SDL_Instance instance);
+void draw_vertical_line(SDL_Instance *instance, int x, int yStart,
+ int yEnd, Uint8 r, Uint8 g, Uint8 b);
+void raycast_and_render(SDL_Instance *instance, double posX, double posY, double dirX,
+ double dirY, double planeX, double planeY, double time, double oldTime);
+int poll_events();
 
 #endif
+
+
 
 //Screen dimension constants
 const int SCREEN_WIDTH = 640;
@@ -226,24 +243,72 @@ void raycast_and_render(SDL_Instance *instance, double posX, double posY, double
         draw_vertical_line(instance, x, drawStart, drawEnd, wallColour.R, wallColour.G, wallColour.B);
     }
 
+    // Input and FPS Counter Timing
     oldTime = time;
     time = SDL_GetTicks();
     double frameTime = (time - oldTime) / 1000.0;
-    double FPS = 1.0 / frameTime;
-    printf("%f", FPS);
+    //double FPS = 1.0 / frameTime;
+    //printf("%f", FPS);
 
     // Insert code for key input
+    double moveSpeed = frameTime * 5.0;
+    double rotSpeed = frameTime * 3.0;
+
+    // move forward if no wall in front
+    if (game.input[SDL_SCANCODE_UP])
+    // if (game.input[SDLK_UP])
+    {
+        if (worldMap[(int)posX + (int)(dirX * moveSpeed)][(int)posY] == false) posX += dirX * moveSpeed;
+        if (worldMap[(int)posX][(int)posY + (int)(dirY * moveSpeed)] == false) posY += dirY * moveSpeed;
+        printf("Up key pressed\n");
+    }
+
+    // move backward if no wall behind
+    if (game.input[SDL_SCANCODE_DOWN])
+    // if (game.input[SDLK_DOWN])
+    {
+        if (worldMap[(int)posX - (int)(dirX * moveSpeed)][(int)posY] == false) posX -= dirX * moveSpeed;
+        if (worldMap[(int)posX][(int)posY - (int)(dirY * moveSpeed)] == false) posY -= dirY * moveSpeed;
+        printf("Down key pressed\n");
+    }
+
+    // rotate to the right
+    if (game.input[SDL_SCANCODE_RIGHT])
+    // if (game.input[SDLK_RIGHT])
+    {
+        // rotate the camera's direction and camera plane
+        double oldDirX = dirX;
+        dirX = dirX * cos(-rotSpeed) - dirY * sin(-rotSpeed);
+        dirY = oldDirX * sin(-rotSpeed) + dirY * cos(-rotSpeed);
+        double oldPlaneX = planeX;
+        planeX = planeX * cos(-rotSpeed) - planeY * sin(-rotSpeed);
+        planeY = oldPlaneX * sin(-rotSpeed) + planeY * cos(-rotSpeed);
+        printf("Right key pressed\n");
+    }
+
+    // rotate to the left
+    if (game.input[SDL_SCANCODE_LEFT])
+    // if (game.input[SDLK_LEFT])
+    {
+        // rotate the camera's direction and camera plane
+        double oldDirX = dirX;
+        dirX = dirX * cos(rotSpeed) - dirY * sin(rotSpeed);
+        dirY = oldDirX * sin(rotSpeed) + dirY * cos(rotSpeed);
+        double oldPlaneX = planeX;
+        planeX = planeX * cos(rotSpeed) - planeY * sin(rotSpeed);
+        planeY = oldPlaneX * sin(rotSpeed) + planeY * cos(rotSpeed);
+        printf("Left key pressed\n");
+    }
+
 
 }
-
-
 
 
 
 int poll_events()
 {
     SDL_Event event;
-    SDL_KeyboardEvent key;
+    // SDL_KeyboardEvent key;
 
     while (SDL_PollEvent(&event))
     {
@@ -264,9 +329,16 @@ int poll_events()
 
         if (event.type == SDL_KEYDOWN)
         {
-            key = event.key;
-            if (key.keysym.scancode == SDL_SCANCODE_ESCAPE)
-                return (1);
+            // key = event.key;
+            // if (key.keysym.scancode == SDL_SCANCODE_ESCAPE)
+            //     return (1);
+            game.input[event.key.keysym.scancode] = true;
+            
+        }
+
+        if (event.type == SDL_KEYUP)
+        {
+            game.input[event.key.keysym.scancode] = false;
         }
     }
     return (0);
