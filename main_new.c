@@ -31,7 +31,7 @@ struct Colour {
 
 //Function Declarations
 int init_instance(SDL_Instance *);
-void draw_components(SDL_Instance instance);
+// void draw_components(SDL_Instance instance);
 void draw_vertical_line(SDL_Instance *instance, int x, int yStart,
  int yEnd, Uint8 r, Uint8 g, Uint8 b);
 void raycast_and_render(SDL_Instance *instance, double posX, double posY, double dirX,
@@ -118,12 +118,12 @@ int init_instance(SDL_Instance *instance)
     return (0);
 }
 
-void draw_components(SDL_Instance instance)
-{
-    SDL_SetRenderDrawColor(instance.renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-    SDL_RenderDrawLine(instance.renderer, 10, 10, 100, 100);
-    // SDL_RenderGeometry(instance.renderer, 0, 4, 4, 4, 4);
-}
+// void draw_components(SDL_Instance instance)
+// {
+//     SDL_SetRenderDrawColor(instance.renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+//     SDL_RenderDrawLine(instance.renderer, 10, 10, 100, 100);
+//     // SDL_RenderGeometry(instance.renderer, 0, 4, 4, 4, 4);
+// }
 
 
 void draw_vertical_line(SDL_Instance *instance, int x, int yStart, int yEnd, Uint8 r, Uint8 g, Uint8 b)
@@ -474,7 +474,9 @@ void poll_events(SDL_Instance *instance, double posX, double posY, double dirX,
 
             switch (event.key.keysym.sym)
             {
-                
+                case SDLK_ESCAPE:
+                    quit = 1;
+                    break;
                 case SDLK_UP:
                     if (worldMap[(int)posX + (int)(dirX * moveSpeed)][(int)posY] == false) posX += dirX * moveSpeed;
                     if (worldMap[(int)posX][(int)posY + (int)(dirY * moveSpeed)] == false) posY += dirY * moveSpeed;
@@ -574,7 +576,7 @@ int main(int argc, char *argv[])
     SDL_Instance instance;
     SDL_bool quit = false;
 
-    init_instance(&instance);
+    // init_instance(&instance);
     if (init_instance(&instance) != 0)
     {
         printf("Instance init error");
