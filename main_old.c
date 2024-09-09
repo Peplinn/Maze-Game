@@ -226,11 +226,11 @@ void raycast_and_render(SDL_Instance *instance, double posX, double posY, double
 
         switch(worldMap[mapX][mapY])
         {
-            case 1:  wallColour.R = 255; wallColour.B = 0; wallColour.G = 0;    break; //red
-            case 2:  wallColour.G = 255; wallColour.R = 0; wallColour.B = 0;    break; //green
-            case 3:  wallColour.B = 255; wallColour.G = 0; wallColour.R = 0;    break; //blue
+            case 1:  wallColour.R = 255;    break; //red
+            case 2:  wallColour.G = 255;    break; //green
+            case 3:  wallColour.B = 255;    break; //blue
             case 4:  wallColour.R = 255; wallColour.G = 255; wallColour.B = 255;  break; //white
-            default: wallColour.R = 255; wallColour.G = 255; wallColour.B = 0; break; //yellow
+            default: wallColour.R = 255; wallColour.G = 255; break; //yellow
         }
 
         if (side == 1)
@@ -349,7 +349,7 @@ int main(int argc, char *argv[])
     printf("Number of arguments: %d\n", argc);
     printf("Argument Values %s\n", argv[0]);
 
-    double posX = 11, posY = 9;
+    double posX = 22, posY = 12;
     double dirX = -1, dirY = 0;
     double planeX = 0, planeY = 0.66;
 

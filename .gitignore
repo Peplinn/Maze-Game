@@ -1,3 +1,7 @@
 /.vs/
 
 /.vscode/
+
+/engine/raycaster_flat.cpp
+
+/engine/raycaster_textured.cpp
