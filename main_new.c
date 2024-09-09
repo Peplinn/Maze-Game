@@ -321,8 +321,8 @@ void poll_events(SDL_Instance *instance, double posX, double posY, double dirX,
                 double sideDistX;
                 double sideDistY;
 
-                double deltaDistX = fabs(1 / rayDirX);
-                double deltaDistY = fabs(1 / rayDirY);
+                double deltaDistX = (rayDirX == 0) ? 1e30 : fabs(1 / rayDirX);
+                double deltaDistY = (rayDirY == 0) ? 1e30 : fabs(1 / rayDirY);
                 double perpWallDist;
 
                 int stepX;
@@ -374,8 +374,11 @@ void poll_events(SDL_Instance *instance, double posX, double posY, double dirX,
                     if (worldMap[mapX][mapY] > 0) hit = 1;
                 }
 
-                if (side == 0) perpWallDist = (mapX - posX + (1 - stepX) / 2) / rayDirX;
-                else perpWallDist = (mapX - posY + (1 - stepY) / 2) / rayDirY;
+                // if (side == 0) perpWallDist = (mapX - posX + (1 - stepX) / 2) / rayDirX;
+                // else perpWallDist = (mapX - posY + (1 - stepY) / 2) / rayDirY;
+
+                if(side == 0) perpWallDist = (sideDistX - deltaDistX);
+                else          perpWallDist = (sideDistY - deltaDistY);
 
                 int lineHeight = (int)(screenHeight / perpWallDist);
 
