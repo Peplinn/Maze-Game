@@ -6,6 +6,7 @@
 
 #include <SDL2/SDL.h>
 #include <stdio.h>
+#include <string.h>
 #include <math.h>
 #include <stdbool.h>
 
@@ -31,15 +32,24 @@ struct Colour {
 
 //Function Declarations
 int init_instance(SDL_Instance *);
-void draw_components(SDL_Instance instance);
+// void draw_components(SDL_Instance instance);
 void draw_vertical_line(SDL_Instance *instance, int x, int yStart,
  int yEnd, Uint8 r, Uint8 g, Uint8 b);
 void raycast_and_render(SDL_Instance *instance, double posX, double posY, double dirX,
  double dirY, double planeX, double planeY, double time, double oldTime);
 // int poll_events();
-void poll_events(SDL_Instance *instance, double posX, double posY, double dirX,
+void poll_events(SDL_Instance *instance, int **worldMap, double posX, double posY, double dirX,
  double dirY, double planeX, double planeY, double time, double oldTime, SDL_bool quit);
 
+
+void get_map_dimensions(FILE *fp, int *rows, int *cols);
+int **allocate_map(int rows, int cols);
+void parse_map(FILE *fp, int **map, int rows, int cols);
+void free_map(int **map, int rows);
+
+char *concat(const char *s1, const char *s2);
+
+void print_map(int **worldMap, int mWidth, int mHeight);
 #endif
 
 
@@ -49,33 +59,35 @@ const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 
 
-int worldMap[mapWidth][mapHeight] =
-{
-  {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,2,2,2,2,2,0,0,0,0,3,0,3,0,3,0,0,0,1},
-  {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,3,0,0,0,3,0,0,0,1},
-  {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,2,2,0,2,2,0,0,0,0,3,0,3,0,3,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,4,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,4,0,0,0,0,5,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,4,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,4,0,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
-};
+// int worldMap[mapWidth][mapHeight] =
+// {
+//   {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+//   {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+//   {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+//   {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+//   {1,0,0,0,0,0,2,2,2,2,2,0,0,0,0,3,0,3,0,3,0,0,0,1},
+//   {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,1},
+//   {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,3,0,0,0,3,0,0,0,1},
+//   {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,1},
+//   {1,0,0,0,0,0,2,2,0,2,2,0,0,0,0,3,0,3,0,3,0,0,0,1},
+//   {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+//   {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+//   {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+//   {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+//   {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+//   {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+//   {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+//   {1,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+//   {1,4,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+//   {1,4,0,0,0,0,5,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+//   {1,4,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+//   {1,4,0,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+//   {1,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+//   {1,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+//   {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+// };
+
+
 
 int init_instance(SDL_Instance *instance)
 {
@@ -118,12 +130,12 @@ int init_instance(SDL_Instance *instance)
     return (0);
 }
 
-void draw_components(SDL_Instance instance)
-{
-    SDL_SetRenderDrawColor(instance.renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-    SDL_RenderDrawLine(instance.renderer, 10, 10, 100, 100);
-    // SDL_RenderGeometry(instance.renderer, 0, 4, 4, 4, 4);
-}
+// void draw_components(SDL_Instance instance)
+// {
+//     SDL_SetRenderDrawColor(instance.renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+//     SDL_RenderDrawLine(instance.renderer, 10, 10, 100, 100);
+//     // SDL_RenderGeometry(instance.renderer, 0, 4, 4, 4, 4);
+// }
 
 
 void draw_vertical_line(SDL_Instance *instance, int x, int yStart, int yEnd, Uint8 r, Uint8 g, Uint8 b)
@@ -300,17 +312,20 @@ void draw_vertical_line(SDL_Instance *instance, int x, int yStart, int yEnd, Uin
 
 
 
-void poll_events(SDL_Instance *instance, double posX, double posY, double dirX,
+void poll_events(SDL_Instance *instance, int **worldMap, double posX, double posY, double dirX,
  double dirY, double planeX, double planeY, double time, double oldTime, SDL_bool quit)
 {
     SDL_Event event;
-
+    printf("Now in the poll events\n");
     while (!quit)
     {
+        // printf("Now in the !quit loop\n");
         while (SDL_PollEvent(&event))
         {
+            // printf("Now in the pollevent loop\n");
             for (int x = 0; x < (screenWidth * 2); x++)
             {
+                // printf("Now in the FOR loop\n");
                 double cameraX = 2 * x / (double)screenWidth - 1;
                 double rayDirX = dirX + planeX * cameraX;
                 double rayDirY = dirY + planeY * cameraX;
@@ -321,8 +336,8 @@ void poll_events(SDL_Instance *instance, double posX, double posY, double dirX,
                 double sideDistX;
                 double sideDistY;
 
-                double deltaDistX = fabs(1 / rayDirX);
-                double deltaDistY = fabs(1 / rayDirY);
+                double deltaDistX = (rayDirX == 0) ? 1e30 : fabs(1 / rayDirX);
+                double deltaDistY = (rayDirY == 0) ? 1e30 : fabs(1 / rayDirY);
                 double perpWallDist;
 
                 int stepX;
@@ -355,27 +370,36 @@ void poll_events(SDL_Instance *instance, double posX, double posY, double dirX,
                     sideDistY = (mapY + 1.0 - posY) * deltaDistY;
                 }
 
-
+                // printf("Now CHECKING FOR HITS\n");
                 while (hit == 0)
                 {
+                    // printf("HIT IS EQUAL TO ZERO\n");
                     if (sideDistX < sideDistY)
                     {
+                        // printf("DIST-X LESS\n");
                         sideDistX += deltaDistX;
                         mapX += stepX;
                         side = 0;
                     }
                     else
                     {
+                        // printf("DIST-Y LESS\n");
                         sideDistY += deltaDistY;
                         mapY += stepY;
                         side = 1;
                     }
-
+                    // printf("BOUTTA CHECK IF HIT IS 1\n");
+                    // printf("MAPX, MAPY: %d\n", worldMap[mapX][mapY]);
                     if (worldMap[mapX][mapY] > 0) hit = 1;
+                    // printf("AFTER THE BOUTTA\n");
                 }
 
-                if (side == 0) perpWallDist = (mapX - posX + (1 - stepX) / 2) / rayDirX;
-                else perpWallDist = (mapX - posY + (1 - stepY) / 2) / rayDirY;
+                // if (side == 0) perpWallDist = (mapX - posX + (1 - stepX) / 2) / rayDirX;
+                // else perpWallDist = (mapX - posY + (1 - stepY) / 2) / rayDirY;
+
+                // printf("Now ABOUT TO DRAW WALLS\n");
+                if(side == 0) perpWallDist = (sideDistX - deltaDistX);
+                else          perpWallDist = (sideDistY - deltaDistY);
 
                 int lineHeight = (int)(screenHeight / perpWallDist);
 
@@ -460,8 +484,8 @@ void poll_events(SDL_Instance *instance, double posX, double posY, double dirX,
             //printf("%f", FPS);
 
             // Insert code for key input
-            double moveSpeed = frameTime * 4.0;
-            double rotSpeed = frameTime * 1.5;
+            double moveSpeed = frameTime * 3.0;
+            double rotSpeed = frameTime * 1.0;
 
             // printf("Haven't exited yet\n");
 
@@ -471,7 +495,10 @@ void poll_events(SDL_Instance *instance, double posX, double posY, double dirX,
 
             switch (event.key.keysym.sym)
             {
-                
+                case SDLK_ESCAPE:
+                    printf("Thanks For Exploring!");
+                    quit = 1;
+                    break;
                 case SDLK_UP:
                     if (worldMap[(int)posX + (int)(dirX * moveSpeed)][(int)posY] == false) posX += dirX * moveSpeed;
                     if (worldMap[(int)posX][(int)posY + (int)(dirY * moveSpeed)] == false) posY += dirY * moveSpeed;
@@ -560,6 +587,34 @@ int main(int argc, char *argv[])
 {
     printf("Number of arguments: %d\n", argc);
     printf("Argument Values %s\n", argv[0]);
+    char *map_path;
+
+    if (argc < 2)
+	{
+		printf("Usage: %s 'map_path'", argv[0]);
+		exit(EXIT_FAILURE);
+	}
+
+    map_path = concat("assets/maps/", argv[1]);
+    FILE *fp = fopen(map_path, "r");
+    if (!fp) {
+        printf("Failed to open map file.\n");
+        // return 1;
+        fprintf(stderr, "Error: Can't open file %s\n", map_path);
+		exit(EXIT_FAILURE);
+    }
+
+    int rows = 0;
+    int cols = 0;
+    get_map_dimensions(fp, &rows, &cols);
+
+    int **worldMap = allocate_map(rows, cols);
+    parse_map(fp, worldMap, rows, cols);
+
+    fclose(fp);
+
+    printf("Loaded Map:\n");
+    print_map(worldMap, cols, rows);
 
     double posX = 22, posY = 12;
     double dirX = -1, dirY = 0;
@@ -571,15 +626,15 @@ int main(int argc, char *argv[])
     SDL_Instance instance;
     SDL_bool quit = false;
 
-    init_instance(&instance);
+    // init_instance(&instance);
     if (init_instance(&instance) != 0)
     {
         printf("Instance init error");
         return(1);
     }
 
-
-    poll_events(&instance, posX, posY, dirX, dirY, planeX, planeY, time, oldTime, quit);
+    printf("About to poll\n");
+    poll_events(&instance, worldMap, posX, posY, dirX, dirY, planeX, planeY, time, oldTime, quit);
     // while (!poll_events())
     // {
     //     SDL_SetRenderDrawColor(instance.renderer, 0, 0, 0, 255);
@@ -595,7 +650,7 @@ int main(int argc, char *argv[])
 
     // }
 
-    
+    free_map(worldMap, rows);
     SDL_DestroyRenderer(instance.renderer);
     SDL_DestroyWindow(instance.window);
     SDL_Quit();
@@ -607,3 +662,75 @@ int main(int argc, char *argv[])
 }
 
 
+void get_map_dimensions(FILE *fp, int *rows, int *cols)
+{
+    char buffer[256];
+    *rows = 0;
+    *cols = 0;
+    
+    while (fgets(buffer, sizeof(buffer), fp)) {
+        if (*cols == 0) {
+            *cols = strlen(buffer) - 1; // Exclude newline
+        }
+        (*rows)++;
+    }
+    printf("Row Count: %d\n", *rows);
+    printf("Col Count: %d\n", *cols);
+    rewind(fp);  // Reset file pointer
+}
+
+
+int **allocate_map(int rows, int cols)
+{
+    int **map = malloc(rows * sizeof(int *));
+    for (int i = 0; i < rows; i++) {
+        map[i] = malloc(cols * sizeof(int));
+    }
+    return map;
+}
+
+
+void parse_map(FILE *fp, int **map, int rows, int cols)
+{
+    char buffer[256];
+    for (int i = 0; i < rows; i++) {
+        if (fgets(buffer, sizeof(buffer), fp)) {
+            for (int j = 0; j < cols; j++) {
+                map[i][j] = buffer[j] - '0';  // Convert char to int
+            }
+        }
+    }
+}
+
+
+void free_map(int **map, int rows)
+{
+    for (int i = 0; i < rows; i++) {
+        free(map[i]);
+    }
+    free(map);
+}
+
+char *concat(const char *s1, const char *s2)
+{
+	char *result = NULL;
+
+	result = malloc(strlen(s1) + strlen(s2) + 1);
+	if (!result)
+		return (NULL);
+
+	strcpy(result, s1);
+	strcat(result, s2);
+	return (result);
+}
+
+
+void print_map(int **worldMap, int mWidth, int mHeight)
+{
+    for (int y = 0; y < mHeight; y++) {
+        for (int x = 0; x < mWidth; x++) {
+            printf("%d ", worldMap[y][x]);  // Print each element with a space
+        }
+        printf("\n");  // Newline after each row
+    }
+}
