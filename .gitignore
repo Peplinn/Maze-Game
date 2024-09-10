@@ -2,6 +2,11 @@
 
 /.vscode/
 
+/engine
 /engine/raycaster_flat.cpp
 
 /engine/raycaster_textured.cpp
+
+main_old.c
+main_oldcopy.c
+SDL2.dll
