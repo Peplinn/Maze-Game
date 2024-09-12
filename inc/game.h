@@ -37,4 +37,6 @@ void free_map(int **map, int rows);
 char *concat(const char *s1, const char *s2);
 void print_map(int **worldMap, int mWidth, int mHeight);
 
+void gun_render(SDL_Instance *instance);
+
 #endif
