@@ -9,6 +9,8 @@ void poll_events(SDL_Instance *instance, int **worldMap,
 
 	while (!quit)
 	{
+		gun_render(instance);
+
 		while (SDL_PollEvent(&event))
 		{
 			for (int x = 0; x < (SCREEN_WIDTH * 2); x++)

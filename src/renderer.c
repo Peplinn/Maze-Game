@@ -53,3 +53,30 @@ void draw_vertical_line(SDL_Instance *instance, int x,
 		SDL_RenderDrawPoint(instance->renderer, x, y);
 	}
 }
+
+
+/**
+ * gun_render - Draws gun image, bmp file to screen
+ * @sdl: data structure of sdl_instance
+ * @map: data structure of map_t containing 2D map information
+ *
+ * Return: nothing
+ */
+void gun_render(SDL_Instance *instance)
+{
+	SDL_Rect weapon = {700, 450, 700, 450};
+	SDL_Surface *surface;
+
+	if (!instance->gun)
+	{
+		surface = SDL_LoadBMP("../assets/textures/gun1.bmp");
+		if (!surface)
+		{
+			exit(EXIT_FAILURE);
+		}
+		instance->gun = SDL_CreateTextureFromSurface(instance->renderer, surface);
+		SDL_FreeSurface(surface);
+	}
+	SDL_RenderCopy(instance->renderer, instance->gun, NULL, &weapon);
+}
+
