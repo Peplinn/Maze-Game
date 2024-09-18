@@ -4,10 +4,10 @@
 The **2D Raycasting Maze Game** is a first-person 3D maze game similar to early titles like Wolfenstein 3D. It is developed using the C programming language and the SDL2 library to render a 3D world from a 2D map via raycasting. The player navigates through mazes while avoiding obstacles, with a goal of reaching the maze's endpoint. The game runs on both macOS and Linux.
 
 ### **Project Link**
-[Project Landing Page] (https://peplin-2d-maze.mystrikingly.com) | [Preview] (https://youtu.be/-252jUHmoWc)
+[Project Landing Page](https://peplin-2d-maze.mystrikingly.com) | [Preview](https://youtu.be/-252jUHmoWc)
 
 ## Author :black_nib:
-[LinkedIn](https://www.linkedin.com/in/chidiebube-oluoma) | [X (Formerly Twitter)] (https://www.x.com/ebubepeterp)
+[LinkedIn](https://www.linkedin.com/in/chidiebube-oluoma) | [X (Formerly Twitter)](https://www.x.com/ebubepeterp)
 
 ## **Installation**
 1. Clone the repository:
@@ -48,6 +48,11 @@ The **2D Raycasting Maze Game** is a first-person 3D maze game similar to early 
    - **Arrow keys**: Rotate and move forward/backward.
    
 3. Create custom maps to play by following the map file format.
+
+![Maze Screenshot1](https://github.com/Peplinn/Maze-Game/assets/Maze_Image_1)
+
+
+![Maze Screenshot 2](https://github.com/Peplinn/Maze-Game/assets/Maze_Image_2)
 
 ### **Map File Format**
 - `0`: Floor/walkable space
