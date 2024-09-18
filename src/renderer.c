@@ -1,5 +1,14 @@
 #include "../inc/game.h"
 
+/**
+* init_instance - Initializes the SDL instance, including window and renderer
+* @instance: SDL_Instance structure to initialize
+*
+* Description: Sets up the SDL window and renderer, and ensures that
+* everything is correctly initialized.
+*
+* Return: 0 on success, 1 on failure.
+*/
 int init_instance(SDL_Instance *instance)
 {
 	/**
@@ -43,7 +52,19 @@ int init_instance(SDL_Instance *instance)
 	return (0);
 }
 
-
+/**
+* draw_vertical_line - Draws a vertical line on the screen
+* @instance: SDL_Instance structure containing SDL components
+* @x: The x-coordinate where the line is drawn
+* @yStart: Starting y-coordinate of the line
+* @yEnd: Ending y-coordinate of the line
+* @r: Red color component of the line
+* @g: Green color component of the line
+* @b: Blue color component of the line
+*
+* Description: Draws a vertical line on the screen from `yStart` to `yEnd`
+* using the specified color (r, g, b).
+*/
 void draw_vertical_line(SDL_Instance *instance, int x,
 	int yStart, int yEnd, Uint8 r, Uint8 g, Uint8 b)
 {
@@ -56,12 +77,12 @@ void draw_vertical_line(SDL_Instance *instance, int x,
 
 
 /**
- * gun_render - Draws gun image, bmp file to screen
- * @sdl: data structure of sdl_instance
- * @map: data structure of map_t containing 2D map information
- *
- * Return: nothing
- */
+* gun_render - Renders the gun image on the screen
+* @instance: SDL_Instance structure containing SDL components
+*
+* Description: Loads and renders the gun image from a BMP file at a
+* fixed position on the screen.
+*/
 void gun_render(SDL_Instance *instance)
 {
 	SDL_Rect weapon = {700, 450, 700, 450};

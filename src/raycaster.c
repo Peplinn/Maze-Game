@@ -1,5 +1,22 @@
 #include "../inc/game.h"
 
+/**
+* poll_events - Main game loop that handles user inputs and renders the scene
+* @instance: SDL_Instance structure containing SDL components
+* @worldMap: 2D array representing the game map
+* @posX: Player's initial x-coordinate
+* @posY: Player's initial y-coordinate
+* @dirX: Player's initial direction on the x-axis
+* @dirY: Player's initial direction on the y-axis
+* @planeX: Camera plane x-coordinate
+* @planeY: Camera plane y-coordinate
+* @time: Current time for frame rate calculations
+* @oldTime: Previous time for frame rate calculations
+* @quit: Boolean flag to indicate if the game should quit
+*
+* Description: Continuously polls for events (e.g., key presses), updates
+* the player's position and orientation, and renders the game scene.
+*/
 void poll_events(SDL_Instance *instance, int **worldMap,
 	double posX, double posY, double dirX,
 	double dirY, double planeX, double planeY,

@@ -1,7 +1,13 @@
 #include "../inc/game.h"
 
 /**
-* Exclude newline, Reset filepointer
+* get_map_dimensions - Calculates the dimensions of the map from a file
+* @fp: File pointer to the map file
+* @rows: Pointer to the number of rows in the map
+* @cols: Pointer to the number of columns in the map
+*
+* Description: Reads through the map file and counts the number of rows
+* and columns. Resets the file pointer to the beginning after reading.
 */
 void get_map_dimensions(FILE *fp, int *rows, int *cols)
 {
@@ -18,7 +24,16 @@ void get_map_dimensions(FILE *fp, int *rows, int *cols)
 	rewind(fp);
 }
 
-
+/**
+* allocate_map - Allocates memory for the game map
+* @rows: Number of rows in the map
+* @cols: Number of columns in the map
+*
+* Description: Dynamically allocates a 2D array (matrix) to represent
+* the game world map.
+*
+* Return: A pointer to the allocated 2D array.
+*/
 int **allocate_map(int rows, int cols)
 {
 	int **map = malloc(rows * sizeof(int *));
@@ -29,7 +44,14 @@ int **allocate_map(int rows, int cols)
 }
 
 /**
-* Convert char to int
+* parse_map - Populates the map with values from the map file
+* @fp: File pointer to the map file
+* @map: 2D array to store the map data
+* @rows: Number of rows in the map
+* @cols: Number of columns in the map
+*
+* Description: Reads the map file line by line, converts characters to
+* integers, and stores them in the 2D array representing the world map.
 */
 void parse_map(FILE *fp, int **map, int rows, int cols)
 {
@@ -47,7 +69,14 @@ void parse_map(FILE *fp, int **map, int rows, int cols)
 	}
 }
 
-
+/**
+* free_map - Frees the memory allocated for the map
+* @map: 2D array representing the map
+* @rows: Number of rows in the map
+*
+* Description: Iterates through the 2D array and frees the memory for
+* each row, then frees the map itself.
+*/
 void free_map(int **map, int rows)
 {
 	for (int i = 0; i < rows; i++)
@@ -57,6 +86,16 @@ void free_map(int **map, int rows)
 	free(map);
 }
 
+/**
+* concat - Concatenates two strings into a new dynamically allocated string
+* @s1: The first string
+* @s2: The second string
+*
+* Description: Allocates memory for a new string that is the result of
+* concatenating `s1` and `s2`. Caller must free the memory.
+*
+* Return: A pointer to the concatenated string, or NULL on failure.
+*/
 char *concat(const char *s1, const char *s2)
 {
 	char *result = NULL;

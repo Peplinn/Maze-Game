@@ -1,5 +1,16 @@
 #include "../inc/game.h"
 
+/**
+* main - Entry point for the maze game
+* @argc: Argument count
+* @argv: Argument vector containing the map file path
+*
+* Description: Initializes game components, loads the map, and starts
+* the event polling loop. Cleans up resources before exiting.
+*
+* Return: 0 on success, otherwise exit with failure.
+*/
+
 int main(int argc, char *argv[])
 {
 	char *map_path;
