@@ -49,10 +49,10 @@ The **2D Raycasting Maze Game** is a first-person 3D maze game similar to early 
    
 3. Create custom maps to play by following the map file format.
 
-![Maze Screenshot1](https://github.com/Peplinn/Maze-Game/assets/images/Maze_Image_1)
+![Maze Screenshot1](https://github.com/Peplinn/Maze-Game/assets/images/Maze_Image_1.png)
 
 
-![Maze Screenshot 2](https://github.com/Peplinn/Maze-Game/assets/images/Maze_Image_2)
+![Maze Screenshot 2](https://github.com/Peplinn/Maze-Game/assets/images/Maze_Image_2.png)
 
 ### **Map File Format**
 - `0`: Floor/walkable space
